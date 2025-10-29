@@ -1,0 +1,3 @@
+Automate the daily workflow in here
+Probably include an entrypoint for Github Actions
+and a script that runs daily which calls the functions that pull and filter data, and send emails.

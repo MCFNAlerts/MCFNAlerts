@@ -1,0 +1,6 @@
+Handles everything related to generating and sending emails.
+Authenticates to Gmail API (handles OAuth token).
+Sends out the daily email to all of mailing list using Gmail API
+
+Input: Filtered JSON from data_pipeline
+Output: sent daily emails
