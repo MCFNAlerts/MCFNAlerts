@@ -1,12 +1,17 @@
 import requests
 import os
 import re
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+currdate = datetime.today().strftime("%Y-%m-%d")
+lastmonthdate = (datetime.today() - relativedelta(months=1)).strftime("%Y-%m-%d")
 
 url = "https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboeContributionPublicSearch&action=export"
 data = {
     "form.contributionAmountGreaterThan": "1,000",        # requests will url-encode
-    "form.contributionDateBegin": "2025-09-22",
-    "form.contributionDateEnd": "2025-10-22",
+    "form.contributionDateBegin": f"{lastmonthdate}",
+    "form.contributionDateEnd": f"{currdate}",
     "form.contributionType": "individual"               
 }
 headers = {
