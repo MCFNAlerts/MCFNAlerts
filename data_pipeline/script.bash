@@ -1,0 +1,1 @@
+curl -X POST "https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboeContributionPublicSearch&action=export" -H "Content-Type: application/json" -d '{"key":"value"}'
