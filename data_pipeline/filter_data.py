@@ -2,87 +2,104 @@ import pandas as pd
 import json
 from datetime import datetime, date, timedelta
 
-INPUT_FILE = "export.xlsx"
-OUTPUT_FILE = "filtered_donations.json"
-MIN_AMOUNT = 1000.00
+INPUT_FILES = [
+    {
+        "filename": "export.xlsx",
+        "source": "donations",
+        "min_amount": 1000.00,
+        "columns": {
+            "committee": "Expending Committee Name",
+            "first_name": "Payee First Name",
+            "last_name_org": "Organization Name/Payee Last Name",
+            "date": "Date of Expenditure",
+            "amount": "Amount of Expenditure"
+        }
+    },
+    {
+        "filename": "expenditures.xlsx",
+        "source": "expenditures",
+        "min_amount": 5000.00,
+        "columns": {
+            "committee": "Filer Name",
+            "first_name": "Payee First Name",
+            "last_name_org": "Payee Last Name/Organization Name",
+            "date": "Expenditure Date",
+            "amount": "Expenditure Amount"
+        }
+    }
+]
+
+OUTPUT_FILE = "filtered_combined.json"
 TARGET_DATE = date.today() - timedelta(days=1)
 
-COL_EXPENDING_COMMITTEE = "Expending Committee Name"
-COL_PAYEE_FIRST_NAME = "Payee First Name"
-COL_PAYEE_LAST_ORG_NAME = "Organization Name/Payee Last Name"
-COL_DATE = "Date of Expenditure"
-COL_AMOUNT = "Amount of Expenditure"
+def get_payee_name(row, first_name_col, last_org_col):
+    first = str(row.get(first_name_col, "")).strip()
+    last_org = str(row.get(last_org_col, "")).strip()
+    if first and first.lower() != "nan":
+        return f"{first} {last_org}".strip()
+    return last_org
 
-def get_payee_name(row):
-    first_name = str(row[COL_PAYEE_FIRST_NAME]).strip()
-    last_org_name = str(row[COL_PAYEE_LAST_ORG_NAME]).strip()
-    if first_name and first_name.lower() != 'nan':
-        return f"{first_name} {last_org_name}"
-    
-    return last_org_name
 
-def process_donations():
-    aggregated_donations = {}
+def process_file(file_cfg):
+    results = []
+    aggregated = {}
+    fname = file_cfg["filename"]
+    cols = file_cfg["columns"]
+    min_amt = file_cfg["min_amount"]
 
     try:
-        df = pd.read_excel(INPUT_FILE)
-        
-        print(f"Filtering for donations on {TARGET_DATE} > {MIN_AMOUNT}...")
-
-        for index, row in df.iterrows():
-            try:
-                expenditure_date_obj = row[COL_DATE]
-                
-                if isinstance(expenditure_date_obj, datetime):
-                    expenditure_date = expenditure_date_obj.date()
-                else:
-                    expenditure_date = datetime.strptime(str(expenditure_date_obj), "%m/%d/%Y").date()
-
-                amount = float(row[COL_AMOUNT])
-
-                if expenditure_date == TARGET_DATE and amount > MIN_AMOUNT:
-                    committee_name = str(row[COL_EXPENDING_COMMITTEE]).strip()
-                    payee_name = get_payee_name(row)
-
-                    aggregation_key = (committee_name, payee_name)
-                    aggregated_donations[aggregation_key] = aggregated_donations.get(aggregation_key, 0) + amount
-
-            except (ValueError, TypeError, KeyError) as e:
-                print(f"Warning: Skipping row {index} due to data error: {e}.")
-            except Exception as e:
-                print(f"Warning: Skipping row {index} due to unexpected error: {e}.")
-
+        df = pd.read_excel(fname)
+        print(f"\nProcessing '{fname}' for {file_cfg['source']} on {TARGET_DATE} (>{min_amt})...")
     except FileNotFoundError:
-        print(f"Error: Input file '{INPUT_FILE}' not found.")
-        return
-    except ImportError:
-        print(f"Error: Missing pandas or openpyxl. Please run: pip install pandas openpyxl")
-        return
+        print(f"File '{fname}' not found, skipping.")
+        return []
     except Exception as e:
-        print(f"An error occurred during file reading: {e}")
-        return
+        print(f"Could not read '{fname}': {e}")
+        return []
 
-    output_data = []
-    for (committee, payee), total_amount in aggregated_donations.items():
-        output_data.append({
+    for index, row in df.iterrows():
+        try:
+            raw_date = row[cols["date"]]
+            if isinstance(raw_date, datetime):
+                expenditure_date = raw_date.date()
+            else:
+                expenditure_date = datetime.strptime(str(raw_date), "%m/%d/%Y").date()
+
+            amount = float(row[cols["amount"]])
+            if expenditure_date == TARGET_DATE and amount > min_amt:
+                committee = str(row.get(cols["committee"], "")).strip()
+                payee = get_payee_name(row, cols["first_name"], cols["last_name_org"])
+                key = (committee, payee)
+                aggregated[key] = aggregated.get(key, 0) + amount
+        except Exception as e:
+            print(f"Skipping row {index} ({e})")
+
+    for (committee, payee), total_amt in aggregated.items():
+        results.append({
             "Expending Committee Name": committee,
             "Payee Name": payee,
-            "Amount": round(total_amount, 2)
+            "Amount": round(total_amt, 2),
+            "Source": file_cfg["source"]
         })
 
-    try:
-        with open(OUTPUT_FILE, mode='w', encoding='utf-8') as outfile:
-            json.dump(output_data, outfile, indent=4)
-        
-        print(f"\nProcessing complete.")
-        print(f"Found {len(output_data)} aggregated transactions.")
-        print(f"Successfully wrote filtered data to '{OUTPUT_FILE}'.")
+    print(f"Found {len(results)} {file_cfg['source']} transactions.")
+    return results
 
-    except IOError as e:
-        print(f"Error writing to output file '{OUTPUT_FILE}': {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred during JSON writing: {e}")
+def main():
+    combined_data = []
+    for cfg in INPUT_FILES:
+        combined_data.extend(process_file(cfg))
+
+    if combined_data:
+        try:
+            with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+                json.dump(combined_data, f, indent=4)
+            print(f"\nAll done! Wrote {len(combined_data)} total entries to '{OUTPUT_FILE}'.")
+        except Exception as e:
+            print(f"Error writing output JSON: {e}")
+    else:
+        print("\nNo matching records found for either file.")
 
 
 if __name__ == "__main__":
-    process_donations()
+    main()
