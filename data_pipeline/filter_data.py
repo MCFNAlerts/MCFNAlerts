@@ -1,6 +1,9 @@
 import pandas as pd
 import json
 from datetime import datetime, date, timedelta
+import os
+
+DOWNLOADS_DIR = os.path.expanduser("~/Downloads")
 
 INPUT_FILES = [
     {
@@ -29,7 +32,7 @@ INPUT_FILES = [
     }
 ]
 
-OUTPUT_FILE = "filtered_combined.json"
+OUTPUT_FILE = os.path.join(DOWNLOADS_DIR, "filtered_combined.json")
 TARGET_DATE = date.today() - timedelta(days=1)
 
 def get_payee_name(row, first_name_col, last_org_col):
@@ -43,18 +46,18 @@ def get_payee_name(row, first_name_col, last_org_col):
 def process_file(file_cfg):
     results = []
     aggregated = {}
-    fname = file_cfg["filename"]
+    path = os.path.join(DOWNLOADS_DIR, file_cfg["filename"])
     cols = file_cfg["columns"]
     min_amt = file_cfg["min_amount"]
 
     try:
-        df = pd.read_excel(fname)
-        print(f"\nProcessing '{fname}' for {file_cfg['source']} on {TARGET_DATE} (>{min_amt})...")
+        df = pd.read_excel(path)
+        print(f"\nProcessing '{path}' for {file_cfg['source']} on {TARGET_DATE} (>{min_amt})...")
     except FileNotFoundError:
-        print(f"File '{fname}' not found, skipping.")
+        print(f"File '{path}' not found, skipping.")
         return []
     except Exception as e:
-        print(f"Could not read '{fname}': {e}")
+        print(f"Could not read '{path}': {e}")
         return []
 
     for index, row in df.iterrows():
