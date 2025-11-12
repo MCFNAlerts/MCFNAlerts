@@ -2,14 +2,9 @@ import pandas as pd
 import json
 from datetime import datetime, date, timedelta
 
-import os
-
-DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), "..", "downloads")
-DOWNLOADS_DIR = os.path.abspath(DOWNLOADS_DIR)
-
 INPUT_FILES = [
     {
-        "filename": "contributions.xlsx",
+        "filename": "export.xlsx",
         "source": "donations",
         "min_amount": 1000.00,
         "columns": {
@@ -25,17 +20,17 @@ INPUT_FILES = [
         "source": "expenditures",
         "min_amount": 5000.00,
         "columns": {
-            "committee": "Expending Committee Name",
+            "committee": "Filer Name",
             "first_name": "Payee First Name",
-            "last_name_org": "Organization Name/Payee Last Name",
-            "date": "Date of Expenditure",
-            "amount": "Amount of Expenditure"
+            "last_name_org": "Payee Last Name/Organization Name",
+            "date": "Expenditure Date",
+            "amount": "Expenditure Amount"
         }
     }
 ]
 
-OUTPUT_FILE = os.path.join(DOWNLOADS_DIR, "filtered_combined.json")
-TARGET_DATE = date.today() - timedelta(days=365)
+OUTPUT_FILE = "filtered_combined.json"
+TARGET_DATE = date.today() - timedelta(days=100)
 
 def get_payee_name(row, first_name_col, last_org_col):
     first = str(row.get(first_name_col, "")).strip()
@@ -48,40 +43,36 @@ def get_payee_name(row, first_name_col, last_org_col):
 def process_file(file_cfg):
     results = []
     aggregated = {}
-    path = os.path.join(DOWNLOADS_DIR, file_cfg["filename"])
+    fname = file_cfg["filename"]
     cols = file_cfg["columns"]
     min_amt = file_cfg["min_amount"]
 
     try:
-        df = pd.read_excel(path)
-        print(f"\nProcessing '{path}' for {file_cfg['source']} on {TARGET_DATE} (>{min_amt})...")
+        df = pd.read_excel(fname)
+        print(f"\nProcessing '{fname}' for {file_cfg['source']} on {TARGET_DATE} (>{min_amt})...")
     except FileNotFoundError:
-        print(f"File '{path}' not found, skipping.")
+        print(f"File '{fname}' not found, skipping.")
         return []
     except Exception as e:
-        print(f"Could not read '{path}': {e}")
+        print(f"Could not read '{fname}': {e}")
         return []
 
     for index, row in df.iterrows():
         try:
             raw_date = row[cols["date"]]
-
-            if str(raw_date).strip().lower() in ["nan", "date of expenditure", "expenditure date", ""]:
-                continue
-
             if isinstance(raw_date, datetime):
                 expenditure_date = raw_date.date()
             else:
                 expenditure_date = datetime.strptime(str(raw_date), "%m/%d/%Y").date()
 
             amount = float(row[cols["amount"]])
-            if (TARGET_DATE <= expenditure_date <= date.today()) and amount > min_amt:
+            if expenditure_date == TARGET_DATE and amount > min_amt:
                 committee = str(row.get(cols["committee"], "")).strip()
                 payee = get_payee_name(row, cols["first_name"], cols["last_name_org"])
                 key = (committee, payee)
                 aggregated[key] = aggregated.get(key, 0) + amount
         except Exception as e:
-            print(f"Skipping row {index}: {e}\n  Raw date={row.get(cols['date'])}, Amount={row.get(cols['amount'])}")
+            print(f"Skipping row {index} ({e})")
 
     for (committee, payee), total_amt in aggregated.items():
         results.append({

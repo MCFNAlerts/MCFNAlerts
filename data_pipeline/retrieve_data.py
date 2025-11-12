@@ -42,6 +42,7 @@ def fetch_and_save(url, data, out_name):
 if __name__ == "__main__":
     today = date.today()
     start_date = today.strftime("%Y-%m-%d")  
+    start_date = "2025-10-01"
 
     contributions_url = (
         "https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do"
