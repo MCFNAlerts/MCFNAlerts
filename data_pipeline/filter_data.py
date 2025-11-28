@@ -9,19 +9,19 @@ DOWNLOADS_DIR = os.path.abspath(DOWNLOADS_DIR)
 
 INPUT_FILES = [
     {
-        "filename": "contributions.xlsx",
-        "source": "donations",
+        "filename": "downloads/contributions.xlsx",
+        "source": "contributions",
         "min_amount": 1000.00,
         "columns": {
-            "committee": "Expending Committee Name",
-            "first_name": "Payee First Name",
-            "last_name_org": "Organization Name/Payee Last Name",
-            "date": "Date of Expenditure",
-            "amount": "Amount of Expenditure"
+            "committee": "Receiving Committee Name",
+            "first_name": "Contributor First Name",
+            "last_name_org": "Organization Name/Contributor Last Name",
+            "date": "Date of Contribution",
+            "amount": "Amount of Contribution"
         }
     },
     {
-        "filename": "expenditures.xlsx",
+        "filename": "downloads/expenditures.xlsx",
         "source": "expenditures",
         "min_amount": 5000.00,
         "columns": {
@@ -34,8 +34,8 @@ INPUT_FILES = [
     }
 ]
 
-OUTPUT_FILE = os.path.join(DOWNLOADS_DIR, "filtered_combined.json")
-TARGET_DATE = date.today() - timedelta(days=365)
+OUTPUT_FILE = "filtered_combined.json"
+TARGET_DATE = date.today() - timedelta(days=1)
 
 def get_payee_name(row, first_name_col, last_org_col):
     first = str(row.get(first_name_col, "")).strip()
@@ -112,3 +112,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

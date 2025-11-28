@@ -1,0 +1,32 @@
+name: Daily MCFN Alerts Email Job
+
+on:
+  schedule:
+    - cron: "0 14 * * *"  # 9 AM EST daily (adjust if needed)
+  workflow_dispatch:
+
+jobs:
+  run-mcf-alerts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run daily pipeline
+      env:
+        GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+      run: |
+        python data_pipeline/retrieve_data.py
+        python data_pipeline/filter_data.py
+        python auto_scripts/send_daily_email.py

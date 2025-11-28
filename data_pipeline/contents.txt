@@ -1,6 +1,0 @@
-Handles all data retrieval and preprocessing.
-Fetches the latest MiTN spreadsheet each day through HTTP request
-Reads that spreadsheet, cleans the data, filters for contributions/expenditures meeting thresholds, outputs filtered JSON.
-Central place for constants like API URLs, file paths, thresholds,etc.
-
-Output: filtered data aggregated by person contributing/spending in a JSON
