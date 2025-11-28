@@ -11,34 +11,6 @@ Live subscriber list integrated through Google Sheets
 Fully automated end-to-end pipeline
 
 
-Project Structure
-MCFN/
-│
-├── auto_scripts/
-│   └── send_daily_email.py
-│
-├── data_pipeline/
-│   ├── retrieve_data.py
-│   ├── filter_data.py
-│
-├── email_service/
-│   ├── gmail_sender.py
-│   ├── email_formatter.py
-│   ├── email_template.html
-│   ├── sheets_reader.py
-│   ├── credentials_loader.py
-│
-├── downloads/
-│   ├── contributions.xlsx
-│   ├── expenditures.xlsx
-│   
-├── auto_scripts/
-│   ├── daily_email.py
-│   
-├── .github/workflows/daily.yml
-└── README.md
-
-
 Required GitHub Secrets
 
 Add the following secrets in:
