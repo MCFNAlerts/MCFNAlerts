@@ -1,68 +1,78 @@
 # MCFN Daily Political Finance Alerts Pipeline
 
-This repository contains the automated system used by the Michigan Campaign Finance Network (MCFN) to send daily political finance alert emails. The workflow downloads political contribution and expenditure data from the State of Michigan database, filters it, formats an email report, and sends it to all subscribers on MCFN’s mailing list. The system is designed to run automatically every day using GitHub Actions.
-
-Features
-
-Automatic daily runs via GitHub Actions
-Bulk BCC sending compliant with Google Workspace Gmail limits
-Threshold-based filtering (Contributions > $1,000, Expenditures > $5,000)
-Live subscriber list integrated through Google Sheets
-Fully automated end-to-end pipeline
+This repository contains the automated system used by the Michigan Campaign Finance Network (MCFN) to send daily political finance alert emails. The pipeline downloads political contribution and expenditure data from the Michigan Bureau of Elections (MiBOE), filters it, formats a daily summary, and emails the report to all subscribers on the MCFN mailing list. The system runs automatically each day using GitHub Actions.
 
 
-Required GitHub Secrets
+## Features
+
+- Automatic daily execution via GitHub Actions
+- Bulk BCC sending compliant with Google Workspace Gmail limits
+- Threshold-based filtering (Contributions over $1,000; Expenditures over $5,000)
+- Live subscriber list integrated through Google Sheets
+- Fully automated end-to-end pipeline
+
+
+## Required GitHub Secrets
 
 Add the following secrets in:
-GitHub → Repo Settings → Secrets and Variables → Actions
+GitHub → Repository Settings → Secrets and Variables → Actions
 
-Secret Name	Description
-GMAIL_SENDER	Workspace Gmail address used to send daily alerts
-CREDENTIALS_JSON	Gmail OAuth client credentials (full JSON as a string)
-GOOGLE_SERVICE_ACCOUNT_JSON	Google Sheets service account key JSON
-SHEET_ID	Google Sheet ID containing subscribers
+GMAIL_SENDER
+Workspace Gmail address used to send the daily alerts
 
+CREDENTIALS_JSON
+Full Gmail OAuth client credentials JSON (pasted as a single line)
 
+GOOGLE_SERVICE_ACCOUNT_JSON
+Full Google Sheets service account JSON (pasted as a single line)
 
-Credentials Setup (MCFN Must Do This After Transfer)
-
-1. Google Sheets Access
-
-Create a Google Cloud project
-Create a service account
-Generate a service account JSON key
-Add JSON to GitHub secret GOOGLE_SERVICE_ACCOUNT_JSON
-Share the Google Sheet with the service account email
-
-2. Gmail API Sending
-
-Enable Gmail API in Google Cloud
-Create an OAuth 2.0 Client (Desktop type)
-Download credentials.json
-Add its contents to CREDENTIALS_JSON secret
-Set GMAIL_SENDER to a Workspace email address
-MCFN must perform the OAuth authorization once locally to generate the refresh token if needed
-
-3. Subscriber Sheet
-
-Set GitHub secret:
-SHEET_ID=your_google_sheet_id
-
-Daily Automation Workflow
-
-The GitHub Actions workflow (.github/workflows/daily.yml) performs:
-Pull daily XLSX data from MiBOE
-Filter contributions/expenditures for the previous day
-Generate filtered_combined.json
-Build formatted HTML email
-Read subscriber list from Google Sheets
-Send email in Workspace-safe BCC batches (max 499 per batch)
-Repeat daily
+SHEET_ID
+The Google Sheet ID containing the subscriber list
 
 
-.gitignore
+## Credentials Setup (Performed by MCFN After Repository Transfer)
 
-The following files must be ignored:
+### 1. Google Sheets Access (Service Account)
+
+- Create or select a Google Cloud project
+- Create a service account
+- Generate a service account JSON key
+- Add the JSON contents to the "GOOGLE_SERVICE_ACCOUNT_JSON" GitHub secret
+- Share the subscriber Google Sheet with the service account email address
+
+### 2. Gmail API Access (OAuth2)
+
+- Enable the Gmail API in the Google Cloud project
+- Create an OAuth 2.0 Desktop Client
+- Download the OAuth credentials.json
+- Add its full content to the "CREDENTIALS_JSON" GitHub secret
+- Set GMAIL_SENDER to the Gmail/Workspace sending address
+- MCFN must run the OAuth authorization once locally if a refresh token is required
+
+### 3. Subscriber Sheet
+
+Set the GitHub secret:
+SHEET_ID = your_google_sheet_id
+
+The pipeline reads subscribers from column A of the "ActiveSubscribers" tab.
+
+
+## Daily Automation Workflow
+
+The GitHub Actions workflow (.github/workflows/daily.yml) performs the following:
+
+1. Download daily XLSX reports for contributions and expenditures
+2. Filter transactions for the previous day using defined thresholds
+3. Produce "filtered_combined.json"
+4. Generate the formatted HTML email summary
+5. Retrieve the subscriber list from Google Sheets
+6. Send emails in BCC batches (maximum 499 recipients per batch)
+7. Repeat automatically every day
+
+
+## .gitignore Requirements
+
+The following must be ignored and not committed:
 
 *.json
 token.json
@@ -72,29 +82,38 @@ downloads/
 __pycache__/
 
 
-Sending Logic (Bulk BCC)
+## Email Sending Logic (Bulk BCC)
 
-Gmail allows 500 total recipients per message
-One "To" address (the sender) + 499 BCC recipients
-Subscribers are split into batches of 499
-Each batch is sent in a single Gmail API call
-A mailing list of ~1400 subscribers requires 3 batches
+- Gmail allows a maximum of 500 total recipients per message
+- The system sends one "To" address (the sender)
+- Up to 499 subscribers are placed in BCC
 
-Transfer of Repository Ownership
+If more than 499 subscribers exist, the list is automatically split into batches.
+For example, 1,400 subscribers results in three separate batched emails.
 
-MCFN must re-create all GitHub Secrets (secrets do NOT transfer)
-MCFN must generate new Google credentials (OAuth + service account)
 
-What the Code Does
+## Transfer of Repository Ownership
 
-Downloads contribution and expenditure reports daily
-Filters transactions based on thresholds
-Generates structured JSON output
-Formats a modern HTML email report
-Reads subscriber emails from live Google Sheets
-Sends email alerts in compliant bulk batches
-Runs automatically with no manual intervention
+When transferring ownership to MCFN:
 
-System Ready
+- GitHub Secrets must be recreated by MCFN because secrets do not transfer
+- New Google credentials must be generated (OAuth2 and Service Account)
+- The service account must be given access to the subscriber Google Sheet
 
-Once secrets are configured and OAuth is completed by MCFN, the system runs fully autonomously through GitHub Actions and requires no additional maintenance.
+Once configured, the system runs entirely without manual maintenance.
+
+
+## What the Code Does
+
+- Downloads daily contribution and expenditure data
+- Filters records above required reporting thresholds
+- Produces a structured JSON output
+- Formats a professional HTML email summary
+- Retrieves subscriber emails from Google Sheets
+- Sends the report via the Gmail API
+- Runs automatically through GitHub Actions every day
+
+
+## System Ready
+
+Once GitHub Secrets and Google credentials are correctly configured by MCFN, the system becomes fully automated and requires no ongoing intervention.
