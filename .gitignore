@@ -1,0 +1,9 @@
+*.json
+.env
+token.json
+credentials.json
+mcfn-testing-0595f479fe7b.json
+__pycache__/
+downloads/
+env/
+.DS_Store
