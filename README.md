@@ -45,7 +45,15 @@ For example, 1,400 subscribers results in three separate batched emails.
 
 # Transfer of Repository Ownership
 
-When transferring ownership to MCFN:
+## Creating account + Repo Ownership 
+
+- Create an ORGANIZATION github account
+- add user 'Rithvin05' to list of people who can edit repo's within your organization
+- User Rithin05 will transfer this repo to MCFN's org account's ownership
+- MCFN org account accepts transfer request and gains ownership of this repo
+
+
+Credentials Intro:
 
 - GitHub Secrets must be recreated by MCFN because secrets do not transfer
 - New Google credentials must be generated (OAuth2 and Service Account)
