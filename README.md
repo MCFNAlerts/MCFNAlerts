@@ -3,7 +3,7 @@
 This repository contains the automated system used by the Michigan Campaign Finance Network (MCFN) to send daily political finance alert emails. The pipeline downloads political contribution and expenditure data from the Michigan Bureau of Elections (MiBOE), filters it, formats a daily summary, and emails the report to all subscribers on the MCFN mailing list. The system runs automatically each day using GitHub Actions.
 
 
-## Features
+# Features
 
 - Automatic daily execution via GitHub Actions
 - Bulk BCC sending compliant with Google Workspace Gmail limits
@@ -21,7 +21,7 @@ This repository contains the automated system used by the Michigan Campaign Fina
 - Sends the report via the Gmail API
 - Runs automatically through GitHub Actions every day
 
-  # Daily Automation Workflow
+# Daily Automation Workflow
 
 The GitHub Actions workflow (.github/workflows/daily.yml) performs the following:
 
@@ -43,7 +43,7 @@ If more than 499 subscribers exist, the list is automatically split into batches
 For example, 1,400 subscribers results in three separate batched emails.
 
 
-## Transfer of Repository Ownership
+# Transfer of Repository Ownership
 
 When transferring ownership to MCFN:
 
