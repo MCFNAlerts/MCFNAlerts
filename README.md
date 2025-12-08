@@ -48,8 +48,8 @@ For example, 1,400 subscribers results in three separate batched emails.
 ## Creating account + Repo Ownership 
 
 - Create an ORGANIZATION github account
-- add user 'Rithvin05' to list of people who can edit repo's within your organization
-- User Rithin05 will transfer this repo to MCFN's org account's ownership
+- add user 'Rithvin05' to list of people who can edit repo's within your organization (owner of repo originally)
+- User Rithvin05 will transfer this repo to MCFN's org account's ownership
 - MCFN org account accepts transfer request and gains ownership of this repo
 
 
