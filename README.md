@@ -1,6 +1,6 @@
 # MCFN Daily Political Finance Alerts Pipeline
 
-This repository contains the automated system used by the Michigan Campaign Finance Network (MCFN) to send daily political finance alert emails. The pipeline downloads political contribution and expenditure data from the Michigan Bureau of Elections (MiBOE), filters it, formats a daily summary, and emails the report to all subscribers on the MCFN mailing list. The system runs automatically each day using GitHub Actions.
+This repository contains the automated system used by the Michigan Campaign Finance Network (MCFN) to send daily political finance alert emails. The pipeline downloads political contribution and expenditure data, filters it, formats a daily summary, and emails the report to all subscribers on the MCFN mailing list. The system runs automatically each day using GitHub Actions.
 
 
 # Features
