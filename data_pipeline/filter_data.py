@@ -9,7 +9,7 @@ DOWNLOADS_DIR = os.path.abspath(DOWNLOADS_DIR)
 
 INPUT_FILES = [
     {
-        "filename": "downloads/contributions.xlsx",
+        "filename": "contributions.xlsx",
         "source": "contributions",
         "min_amount": 1000.00,
         "columns": {
@@ -21,7 +21,7 @@ INPUT_FILES = [
         }
     },
     {
-        "filename": "downloads/expenditures.xlsx",
+        "filename": "expenditures.xlsx",
         "source": "expenditures",
         "min_amount": 5000.00,
         "columns": {
