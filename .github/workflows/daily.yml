@@ -29,4 +29,4 @@ jobs:
       run: |
         python data_pipeline/retrieve_data.py
         python data_pipeline/filter_data.py
-        python auto_scripts/send_daily_email.py
+        python auto_scripts/daily_email.py
