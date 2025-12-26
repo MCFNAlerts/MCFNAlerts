@@ -69,21 +69,8 @@ Once configured, the system runs entirely without manual maintenance.
 - Create a service account
 - Generate a service account JSON key
 - Add the JSON contents to the "GOOGLE_SERVICE_ACCOUNT_JSON" GitHub secret
-- Share the subscriber Google Sheet with the service account email address
-
-### 2. Gmail API Access (OAuth2)
-
-- Enable the Gmail API in the Google Cloud project
-- Create an OAuth 2.0 Desktop Client
-- Download the OAuth credentials.json
-- Add its full content to the "CREDENTIALS_JSON" GitHub secret
-- Set GMAIL_SENDER to the Gmail/Workspace sending address
-- MCFN must run the OAuth authorization once locally if a refresh token is required
-
-### 3. Mailing List
-
-Set the GitHub secret:
-SHEET_ID = your_google_sheet_id
+  
+### 2. Mailing List
 
 Create a Google Form with 2 questions:
 1. 'Email Address' as short answer text
@@ -110,7 +97,23 @@ Create a Google Form with 2 questions:
   SORT(FILTER(results, results<>""))
 )
 ````
+- Navigate to the responses tab on your newly created google form and click 'Link to sheets' (This will be referred to as the 'subscriber Google Sheet')
+- Share the subscriber Google Sheet with the service account email address
 
+- Set the GitHub secret:
+SHEET_ID = your_google_sheet_id
+You can find the sheet id from the spreadsheet URL ( format: https://docs.google.com/spreadsheets/d.../edit#gid=**SHEET_ID** )
+
+
+
+### 3. Gmail API Access (OAuth2)
+
+- Enable the Gmail API in the Google Cloud project
+- Create an OAuth 2.0 Desktop Client
+- Download the OAuth credentials.json
+- Add its full content to the "CREDENTIALS_JSON" GitHub secret
+- Set GMAIL_SENDER to the Gmail/Workspace sending address
+- MCFN must run the OAuth authorization once locally if a refresh token is required
 
 
 ## Required GitHub Secrets
