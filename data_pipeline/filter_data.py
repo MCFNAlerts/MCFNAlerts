@@ -11,7 +11,7 @@ INPUT_FILES = [
     {
         "filename": "contributions.xlsx",
         "source": "contributions",
-        "min_amount": 1000.00,
+        "min_amount": 500.00,
         "columns": {
             "committee": "Receiving Committee Name",
             "first_name": "Contributor First Name",
@@ -23,7 +23,7 @@ INPUT_FILES = [
     {
         "filename": "expenditures.xlsx",
         "source": "expenditures",
-        "min_amount": 5000.00,
+        "min_amount": 1000.00,
         "columns": {
             "committee": "Expending Committee Name",
             "first_name": "Payee First Name",
